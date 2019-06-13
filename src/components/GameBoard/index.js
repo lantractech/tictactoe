@@ -25,16 +25,111 @@ export default class GameBoard extends React.Component {
             1: 'times',
             2: 'circle outline'
         }
+        this.winnerMap = [
+            ['1','2','3'],
+            ['4','5','6'],
+            ['7','8','9'],
+            ['1','4','7'],
+            ['2','5','8'],
+            ['3','6','9'],
+            ['1','5','9'],
+            ['3','5','7']
+        ]
+
         this.itemDropped = this.itemDropped.bind(this)
         this.getIcon = this.getIcon.bind(this)
         this.clearCurrent = this.clearCurrent.bind(this)
         this.isPendingActive = this.isPendingActive.bind(this)
         this.restartGame = this.restartGame.bind(this)
+        this.submitClicked = this.submitClicked.bind(this)
+    }
+
+    submitClicked = () => {
+        //update boardStatus state
+        const newBoardStatus = this.setOwnedBy()
+        this.setState({boardStatus: newBoardStatus}, () => {
+            //check winner mapping
+            const winner = this.foundWinner()
+            if (winner) {
+                let message = winner === 1 ? 'Player One Wins!!!' : 'Player Two Wins!!!'
+                this.props.changeMessage(message)
+                this.props.setWinner()
+            }
+            //if no winner, determine if all spots are filled
+            //if all spots are filled, and no winner, then send message 'draw'
+            else if (this.isOwnedByFilled()) {
+                let message = 'Looks like a Draw. Play again!'
+                this.props.changeMessage(message)
+            }
+            //if all spots are NOT filled, then switch players
+            else {
+                this.props.changePlayer()
+                this.props.changeMessage()
+            }
+        })
+
+    }
+
+    foundWinner = () => {
+        const playerOneList = this.getPlacementListForPlayer(1)
+        const playerTwoList = this.getPlacementListForPlayer(2)
+        console.log(JSON.stringify(playerOneList))
+        console.log(JSON.stringify(playerTwoList))
+        let winner = null;
+
+        if (playerOneList.length > 2){
+            _.forEach(this.winnerMap,(array) => {
+                if (_.isEmpty(_.difference(array,playerOneList))) {
+                    winner = 1
+                }
+            })
+        }
+
+        if (playerTwoList.length > 2){
+            _.forEach(this.winnerMap,(array) => {
+                if (_.isEmpty(_.difference(array, playerTwoList))) {
+                    winner = 2
+                }
+            })
+        }
+
+        return winner
+    }
+
+    getPlacementListForPlayer = (player) => {
+        let list = []
+        _.forEach(this.state.boardStatus,(obj,key) => {
+            if (obj.ownedBy === player) {
+                list.push(key)
+            }
+        })
+        return list
     }
 
     restartGame = () => {
         this.props.resetAppState()
         this.setState(this.stateOrig)
+    }
+
+    setOwnedBy = () => {
+        return _.mapValues(this.state.boardStatus, (o) => {
+            if (o.pendingBy) {
+                return { ownedBy: o.pendingBy, pendingBy: null }
+            }
+            else {
+                return { ownedBy: o.ownedBy, pendingBy: null }
+            }
+        })
+    }
+
+    isOwnedByFilled = () => {
+        let isOwnedByFilled = true;
+        _.forEach(this.state.boardStatus, (o) => {
+            if (!o.ownedBy){
+                isOwnedByFilled = false;
+            }
+        })
+        return isOwnedByFilled
     }
 
     isPendingActive = () => {
@@ -177,7 +272,7 @@ export default class GameBoard extends React.Component {
     render() {
         const isPendingActive = this.isPendingActive()
         const defaultStyle = {width: 160, margin: '0 20px'}
-        const submitColor = isPendingActive ? 'teal': 'default'
+        const submitColor = isPendingActive ? 'teal': ''
         return (
             <Grid textAlign='center' columns='equal' stackable>
                 <Grid.Row verticalAlign='middle'>
@@ -187,8 +282,8 @@ export default class GameBoard extends React.Component {
                 </Grid.Row>
                 <Grid.Row style={{marginBottom: 50}}>
                     <Button content="Restart Game" onClick={this.restartGame} style={defaultStyle}/>
-                    <Button content="Clear" onClick={this.clearCurrent} style={defaultStyle}/>
-                    <Button content="Submit" disabled={!isPendingActive} color={submitColor} style={defaultStyle}/>
+                    <Button content="Clear" onClick={this.clearCurrent} disabled={this.props.winner} style={defaultStyle}/>
+                    <Button content="Submit" onClick={this.submitClicked} disabled={!isPendingActive || this.props.winner} color={submitColor} style={defaultStyle}/>
                 </Grid.Row>
             </Grid>
         )

@@ -10,14 +10,40 @@ export default class App extends React.Component {
     super();
     this.state = {
       activePlayer: 1,
-      message: 'Ready Player One'
+      message: 'Ready Player One',
+      winner: false
     }
     this.stateOrig = _.cloneDeep(this.state)
     this.resetAppState = this.resetAppState.bind(this)
+    this.changeMessage = this.changeMessage.bind(this)
+    this.changePlayer = this.changePlayer.bind(this)
+    this.setWinner = this.setWinner.bind(this)
   }
 
   resetAppState = () => {
     this.setState(this.stateOrig)
+  }
+
+  setWinner = () => {
+    this.setState({winner: true})
+  }
+
+  changePlayer = () => {
+    const { activePlayer } = this.state
+    const newPlayer = activePlayer === 1 ? 2 : 1
+    this.setState({ activePlayer: newPlayer })
+  }
+
+  changeMessage = (message) => {
+    const { activePlayer } = this.state
+    let newMessage = activePlayer === 1 ? 'Your turn, Player Two!' : 'Your turn, Player One!'
+    if (message) {
+      this.setState({ message: message })
+    }
+    else {
+      this.setState({ message: newMessage })
+    }
+
   }
 
   render() {
@@ -25,8 +51,16 @@ export default class App extends React.Component {
       <React.Fragment>
         <Header />
         <Container>
-          <PlayerBar activePlayer={this.state.activePlayer} message={this.state.message} />
-          <GameBoard activePlayer={this.state.activePlayer} resetAppState={this.resetAppState}/>
+          <PlayerBar 
+            activePlayer={this.state.activePlayer} 
+            message={this.state.message} />
+          <GameBoard
+            winner={this.state.winner}
+            activePlayer={this.state.activePlayer}
+            setWinner={this.setWinner}
+            resetAppState={this.resetAppState} 
+            changePlayer={this.changePlayer}
+            changeMessage={this.changeMessage}/>
         </Container>
       </React.Fragment>
     )
