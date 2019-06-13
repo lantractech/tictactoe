@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash'
 import { Container } from 'semantic-ui-react'
 import Header from '../Header'
 import PlayerBar from '../PlayerBar'
@@ -11,6 +12,12 @@ export default class App extends React.Component {
       activePlayer: 1,
       message: 'Ready Player One'
     }
+    this.stateOrig = _.cloneDeep(this.state)
+    this.resetAppState = this.resetAppState.bind(this)
+  }
+
+  resetAppState = () => {
+    this.setState(this.stateOrig)
   }
 
   render() {
@@ -19,7 +26,7 @@ export default class App extends React.Component {
         <Header />
         <Container>
           <PlayerBar activePlayer={this.state.activePlayer} message={this.state.message} />
-          <GameBoard activePlayer={this.state.activePlayer}/>
+          <GameBoard activePlayer={this.state.activePlayer} resetAppState={this.resetAppState}/>
         </Container>
       </React.Fragment>
     )

@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash'
-import { Grid, Segment, Icon } from 'semantic-ui-react'
+import { Grid, Segment, Icon, Button } from 'semantic-ui-react'
 import { Draggable, Droppable } from 'react-simple-drag-n-drop'
 
 export default class GameBoard extends React.Component {
@@ -19,19 +19,47 @@ export default class GameBoard extends React.Component {
                 9: { ownedBy: null, pendingBy: null }
             }
         }
+        this.stateOrig = _.cloneDeep(this.state)
+        
         this.iconMap = {
             1: 'times',
             2: 'circle outline'
         }
         this.itemDropped = this.itemDropped.bind(this)
         this.getIcon = this.getIcon.bind(this)
+        this.clearCurrent = this.clearCurrent.bind(this)
+        this.isPendingActive = this.isPendingActive.bind(this)
+        this.restartGame = this.restartGame.bind(this)
+    }
+
+    restartGame = () => {
+        this.props.resetAppState()
+        this.setState(this.stateOrig)
+    }
+
+    isPendingActive = () => {
+        let pendingActive = false;
+        _.forEach(this.state.boardStatus, (o) => {
+            if (o.pendingBy){
+                pendingActive = true;
+            }
+        })
+        return pendingActive
+    }
+
+    resetPendingBy = () => {
+        return _.mapValues(this.state.boardStatus, (o) => {
+            return { ownedBy: o.ownedBy, pendingBy: null }
+        })
+    }
+
+    clearCurrent = () => {
+        const newBoardStatus = this.resetPendingBy()
+        this.setState({ boardStatus: newBoardStatus })
     }
 
     itemDropped = (num) => {
-        const newBoardStatus = _.mapValues(this.state.boardStatus, (o) => {
-            return { ownedBy: o.ownedBy, pendingBy: null }
-        })
-
+        const newBoardStatus = this.resetPendingBy()
         newBoardStatus[num].pendingBy = this.props.activePlayer
         this.setState({ boardStatus: newBoardStatus })
     }
@@ -147,12 +175,20 @@ export default class GameBoard extends React.Component {
     }
 
     render() {
+        const isPendingActive = this.isPendingActive()
+        const defaultStyle = {width: 160, margin: '0 20px'}
+        const submitColor = isPendingActive ? 'teal': 'default'
         return (
             <Grid textAlign='center' columns='equal' stackable>
                 <Grid.Row verticalAlign='middle'>
                     {this.getPlayerOneIcon()}
                     {this.getGameBoard()}
                     {this.getPlayerTwoIcon()}
+                </Grid.Row>
+                <Grid.Row style={{marginBottom: 50}}>
+                    <Button content="Restart Game" onClick={this.restartGame} style={defaultStyle}/>
+                    <Button content="Clear" onClick={this.clearCurrent} style={defaultStyle}/>
+                    <Button content="Submit" disabled={!isPendingActive} color={submitColor} style={defaultStyle}/>
                 </Grid.Row>
             </Grid>
         )
