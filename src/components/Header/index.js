@@ -14,7 +14,7 @@ export default class Header extends React.Component {
             <Menu stackable size="huge">
                 <Menu.Item>
                     <Icon name='hashtag' size='large' color={'teal'} />
-                    <span style={{ color: '#00b5ad', fontWeight: 'bold', fontSize: 18 }}>TicTacToe</span>
+                    <span style={{ color: '#00b5ad', fontWeight: 'bold', fontSize: 18 }}>TicTacToe Project</span>
                 </Menu.Item>
 
                 <Requirements />

@@ -2,6 +2,7 @@ import React from 'react';
 import { Container } from 'semantic-ui-react'
 import Header from '../Header'
 import PlayerBar from '../PlayerBar'
+import GameBoard from '../GameBoard'
 
 export default class App extends React.Component {
   constructor() {
@@ -18,6 +19,7 @@ export default class App extends React.Component {
         <Header />
         <Container>
           <PlayerBar activePlayer={this.state.activePlayer} message={this.state.message} />
+          <GameBoard activePlayer={this.state.activePlayer}/>
         </Container>
       </React.Fragment>
     )
