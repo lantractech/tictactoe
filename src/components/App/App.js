@@ -1,20 +1,25 @@
 import React from 'react';
 import { Container } from 'semantic-ui-react'
 import Header from '../Header'
+import PlayerBar from '../PlayerBar'
 
 export default class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      message: 'Initial commit'
+      activePlayer: 1,
+      message: 'Ready Player One'
     }
   }
 
   render() {
     return (
-      <Container style={{ marginTop: 10 }}>
+      <React.Fragment>
         <Header />
-      </Container>
+        <Container>
+          <PlayerBar activePlayer={this.state.activePlayer} message={this.state.message} />
+        </Container>
+      </React.Fragment>
     )
   }
 
