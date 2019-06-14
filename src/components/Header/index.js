@@ -9,6 +9,14 @@ export default class Header extends React.Component {
         this.state = {}
     }
 
+    accessGitHub = () => {
+        return (
+            <Menu.Item onClick={() => window.open('https://github.com/lantractech/tictactoe', "_blank") }>
+                GitHub
+            </Menu.Item>
+        )
+    }
+
     render() {
         return (
             <Menu stackable size="huge">
@@ -19,6 +27,7 @@ export default class Header extends React.Component {
 
                 <Requirements />
                 <Considerations />
+                {this.accessGitHub()}
             </Menu>
         )
     }

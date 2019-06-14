@@ -155,7 +155,9 @@ export default class GameBoard extends React.Component {
 
     itemDropped = (num) => {
         const newBoardStatus = this.resetPendingBy()
-        newBoardStatus[num].pendingBy = this.props.activePlayer
+        if (!newBoardStatus[num].ownedBy){
+            newBoardStatus[num].pendingBy = this.props.activePlayer
+        }
         this.setState({ boardStatus: newBoardStatus })
     }
 
